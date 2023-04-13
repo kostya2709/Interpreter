@@ -1,0 +1,63 @@
+# 1 "opcode.cpp"
+# 1 "<built-in>" 1
+# 1 "<built-in>" 3
+# 414 "<built-in>" 3
+# 1 "<command line>" 1
+# 1 "<built-in>" 2
+# 1 "opcode.cpp" 2
+# 1 "./opcode.hpp" 1
+
+
+enum {
+    RType,
+    IType,
+    SType,
+    BType,
+    UType,
+    JType
+};
+
+enum {
+
+
+# 1 "../configs/instructions.hpp" 1
+
+
+OPER_ADDI = 0x00000013
+# 16 "./opcode.hpp" 2
+
+
+};
+
+struct RType {
+    uint32_t opcode : 7;
+    uint32_t rd : 5;
+    uint32_t funct3 : 3;
+    uint32_t rs1 : 5;
+    uint32_t rs2 : 5;
+    uint32_t funct7 : 7;
+}
+
+struct IType {
+    uint32_t opcode : 7;
+    uint32_t rd : 5;
+    uint32_t funct3 : 3;
+    uint32_t rs1 : 5;
+    uint32_t imm : 12;
+}
+
+struct SType {
+    uint32_t opcode : 7;
+    uint32_t imm5 : 5;
+    uint32_t funct3 : 3;
+    uint32_t rs1 : 5;
+    uint32_t rs2 : 5;
+    uint32_t imm7 : 7;
+}
+
+uint32_t getOpcode( Instr instr);
+# 2 "opcode.cpp" 2
+
+uint32_t getOpcode( Instr instr) {
+    return 0x7f & instr;
+}
