@@ -20,6 +20,16 @@ enum OP {
 
 };
 
+
+enum Reg {
+#define REG( reg_name, pseudo, enum_name, idx) \
+        enum_name = idx,                                      
+#include <configs/regs.hpp>
+#undef REG
+        END
+};
+
+
 struct RTypeInstr {
     uint32_t opcode : 7;
     uint32_t rd     : 5;
@@ -51,8 +61,7 @@ uint32_t getOpcode( Instr instr);
 
 InstrFmt getInstrFmt( Instr instr);
 
-class InstrDescr {
-public:
+struct InstrDescr {
     InstrFmt fmt;
     OP oper;
 };
@@ -70,7 +79,7 @@ struct ArgDescr {
     vmsize_t value = 0;
 
     vmsize_t getValue( VirtualMachineState& ctx);
-    ArgDescr& setValue( VirtualMachineState& ctx, vmsize_t value);
+    void setValue( VirtualMachineState& ctx, vmsize_t value);
 };
 
 ArgDescr getArg1( Instr instr, InstrDescr descr);

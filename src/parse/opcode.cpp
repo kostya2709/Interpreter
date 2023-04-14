@@ -32,11 +32,11 @@ InstrFmt getInstrFmt( Instr instr) {
     uint32_t opc = getOpcode( instr);
     uint32_t opc_mask = 0x7f;
     InstrFmt fmt;
-    printf("instrrr 0x%x\n", opc);
+
     if (0) {}
-#define OPER(opcode, oper_name, name, type, idx) \
-    else if ( (opc_mask & opcode) == opc ) { \
-        fmt = type; \
+#define OPER(opcode, oper_name, name, type, idx)    \
+    else if ( (opc_mask & opcode) == opc ) {        \
+        fmt = type;                                 \
     }
     #include <configs/instructions.hpp>
 #undef OPER
@@ -50,7 +50,7 @@ InstrFmt getInstrFmt( Instr instr) {
 InstrDescr getInstrDescr( Instr instr) {
     InstrDescr descr;
     uint32_t opcode_fnct = getOpcodeFunct( instr);
-    printf("opcode_funct: 0x%x\n", opcode_fnct);
+
     switch ( opcode_fnct ) {
 #define OPER( opcode, oper_name, name, type, idx)   \
     case opcode:                                    \
@@ -60,7 +60,7 @@ InstrDescr getInstrDescr( Instr instr) {
 #include <configs/instructions.hpp>
 #undef OPER
     };
-    printf( "oper: %x\n", descr.oper);
+
     return descr;
 }
 
@@ -160,7 +160,7 @@ vmsize_t ArgDescr::getValue( VirtualMachineState& ctx) {
     }
 }
 
-ArgDescr& ArgDescr::setValue( VirtualMachineState& ctx, vmsize_t new_val) {
+void ArgDescr::setValue( VirtualMachineState& ctx, vmsize_t new_val) {
     if ( type == ArgType::None ) {
         throw std::runtime_error( "Attempt to set value of an uninitialized arg");
     } else if ( type == ArgType::Reg ) {
@@ -168,7 +168,6 @@ ArgDescr& ArgDescr::setValue( VirtualMachineState& ctx, vmsize_t new_val) {
             throw std::runtime_error( "Invalid register number " + std::to_string( value));
         } else {
             ctx.registers[value] = new_val;
-            return *this;
         }
     } else if ( type == ArgType::Imm ) {
         throw std::runtime_error( "Attempt to assign to immediate");

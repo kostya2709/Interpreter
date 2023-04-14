@@ -12,4 +12,4 @@ _start:     # entry point
     ecall               # Call linux to terminate the program
 
 .data
-   helloworld: "Hello, World"
+   helloworld: "Hello, мир"

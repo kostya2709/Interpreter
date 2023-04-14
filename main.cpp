@@ -6,11 +6,9 @@
 
 int main() {
 
-
   Compiler comp;
-  comp.run( "../asm.s");
+  comp.run( "../examples/Fibonacci/Fibonacci");
   // Interpreter interp;
-  // interp.run("../input.txt");
-
+  // interp.run("../examples/Fibonacci/Fibonacci.bc");
   return 0;
 }

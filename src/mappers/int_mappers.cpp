@@ -7,10 +7,6 @@ void AddMapper( Instr instr, const InstrDescr& descr, VirtualMachineState& ctx) 
     ArgDescr arg2 = getArg2( instr, descr);
     ArgDescr res = getRes( instr, descr);
 
-    std::cout << arg1.type << " " << arg1.value << "\n";
-    std::cout << arg2.type << " " << arg2.value << "\n";
-    std::cout << res.type << " " << res.value << "\n";
-
     res.setValue( ctx, arg1.getValue(ctx) + arg2.getValue(ctx));
 }
 

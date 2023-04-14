@@ -3,13 +3,15 @@
 #include <array>
 #include <vector>
 #include <configs/defs.hpp>
+#include <optional>
 
 class VirtualMachineState {
 
 public:
     Instr getNextInstr();
 
-    std::array<IntReg, REG_NUM> registers;
+    std::array<IntReg, REG_NUM> registers{};
+    std::optional<IntReg> errorCode;
     IntReg pc;
 };
 

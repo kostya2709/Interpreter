@@ -5,6 +5,7 @@
 #include "machine.hpp"
 #include <mappers/int_mappers.hpp>
 #include <mappers/cond_mappers.hpp>
+#include <mappers/call.hpp>
 #include <mappers/memory.hpp>
 #include <file/header.hpp>
 #include <utils/files.hpp>
@@ -14,7 +15,7 @@ void Interpreter::run( const std::string& filename) {
     size_t fileSize = getFileSize( filename);
     memoryManager_.loadFile( filename, fileSize, context_);
 
-    while ( context_.pc != (uint64_t)memoryManager_.sectionData ) {
+    while ( !context_.errorCode.has_value() ) {
         Instr curInstr = context_.getNextInstr();
         processInstr( curInstr);
     }
@@ -27,80 +28,64 @@ void Interpreter::processInstr( const Instr& instr) {
     uint32_t oper = descr.oper;
     switch ( oper ) {
         case OP::ADDI:
-            std::cout << "addi\n";
             AddMapper( instr, descr, context_);
             break;
         case OP::SUB:
-            std::cout << "sub\n";
             SubMapper( instr, descr, context_);
             break;
         case OP::BEQ:
-            std::cout << "beq\n";
             BranchMapper( instr, descr, context_, []( uint32_t left, uint32_t right) { return left == right; });
             break;
         case OP::BNE:
-            std::cout << "bne\n";
             BranchMapper( instr, descr, context_, []( uint32_t left, uint32_t right) { return left != right; });
             break;
         case OP::BLT:
-            std::cout << "blt\n";
             BranchMapper( instr, descr, context_, []( int32_t left, int32_t right) { return left < right; });
             break;
         case OP::BGE:
-            std::cout << "bge\n";
             BranchMapper( instr, descr, context_, []( int32_t left, int32_t right) { return left >= right; });
             break;
         case OP::BLTU:
-            std::cout << "bltu\n";
             BranchMapper( instr, descr, context_, []( uint32_t left, uint32_t right) { return left < right; });
             break;
         case OP::BGEU:
-            std::cout << "bgeu\n";
             BranchMapper( instr, descr, context_, []( uint32_t left, uint32_t right) { return left >= right; });
             break;
         case OP::LB:
-            std::cout << "lb\n";
             LoadMapper<int8_t>( instr, descr, context_);
             break;
         case OP::LH:
-            std::cout << "lh\n";
             LoadMapper<int16_t>( instr, descr, context_);
             break;
         case OP::LW:
-            std::cout << "lw\n";
             LoadMapper<int32_t>( instr, descr, context_);
             break;
         case OP::LD:
-            std::cout << "ld\n";
             LoadMapper<int64_t>( instr, descr, context_);
             break;
         case OP::LBU:
-            std::cout << "lbu\n";
             LoadMapper<uint8_t>( instr, descr, context_);
             break;
         case OP::LHU:
-            std::cout << "lhu\n";
             LoadMapper<uint16_t>( instr, descr, context_);
             break;
         case OP::LWU:
-            std::cout << "lwu\n";
             LoadMapper<uint32_t>( instr, descr, context_);
             break;
         case OP::SB:
-            std::cout << "sb\n";
             StoreMapper<uint8_t>( instr, descr, context_);
             break;
         case OP::SH:
-            std::cout << "sh\n";
             StoreMapper<uint16_t>( instr, descr, context_);
             break;
         case OP::SW:
-            std::cout << "sw\n";
             StoreMapper<uint32_t>( instr, descr, context_);
             break;
         case OP::SD:
-            std::cout << "sd\n";
             StoreMapper<uint64_t>( instr, descr, context_);
+            break;
+        case OP::ECALL:
+            syscallMapper( context_, memoryManager_);
             break;
 
         default:
@@ -118,10 +103,15 @@ void MemoryManager::loadFile( const std::string& filename, size_t fileSize, Virt
     file.close();
 
     Header* header = (Header*)data_.data();
+    if ( header->entryPointOffset == -1 ) {
+        throw std::runtime_error( "No entry point. Set \"_start\" label");
+    }
     ctx.pc = reinterpret_cast<uint64_t>(data_.data() + header->entryPointOffset);
+    sectionTextPtr = data_.data() + sizeof(header);
     sectionData = data_.data() + header->sectionDataEntryOffset;
-    stackPtr = data_.data() + fileSize;
+    stackPtr = data_.data() + fileSize + STACK_SIZE;
     stackTopPtr = stackPtr;
+    ctx.registers[Reg::SP] = reinterpret_cast<IntReg>( stackPtr);
 }
 
 Instr VirtualMachineState::getNextInstr() {

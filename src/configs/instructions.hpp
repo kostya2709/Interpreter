@@ -23,3 +23,5 @@ OPER( 0x00000023, SB, "sb", SType, 0)
 OPER( 0x00001023, SH, "sh", SType, 0)
 OPER( 0x00002023, SW, "sw", SType, 0)
 OPER( 0x00003023, SD, "sd", SType, 0)
+
+OPER( 0x00000073, ECALL, "ecall", IType, 0)

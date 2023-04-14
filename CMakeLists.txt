@@ -14,6 +14,7 @@ add_executable(
     ${VirtualMachine_SOURCE_DIR}/src/parse/opcode.cpp
     ${VirtualMachine_SOURCE_DIR}/src/file/header.cpp
     ${VirtualMachine_SOURCE_DIR}/src/mappers/int_mappers.cpp
+    ${VirtualMachine_SOURCE_DIR}/src/mappers/call.cpp
     ${VirtualMachine_SOURCE_DIR}/src/compiler/compiler.cpp
     ${VirtualMachine_SOURCE_DIR}/src/utils/files.cpp
 )
